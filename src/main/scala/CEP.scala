@@ -1,5 +1,6 @@
 package scala.events
 
+import scala.collection.immutable.Queue
 import scala.collection.mutable.ListBuffer
 
 object time {
@@ -17,16 +18,17 @@ object time {
 }
 
 class JointEventNode[T, U, V](ev1: Event[T], ev2: => Event[U], interval: Int, merge: (T, U) => V) extends EventNode[V] {
-  var events1: List[(Int, T)] = Nil
-  var events2: List[(Int, U)] = Nil
+
+  var events1 = Queue[(Int, T)]()
+  var events2 = Queue[(Int, U)]()
 
   /*
    * Reaction to event1
    */
   lazy val onEvt1 = (id: Int, v1: T, reacts: ListBuffer[() => Unit]) => {
-    events1 = (time.now + interval, v1) :: events1
-    events2 = events2.filter(_._1 >= time.now)
-    for ((_, v2) <- events2.reverse) {
+    events1 = events1.enqueue((time.now + interval, v1))
+    events2 = events2.dropWhile(_._1 < time.now)
+    for ((_, v2) <- events2) {
       reactions(id, merge(v1, v2), reacts)
     }
   }
@@ -35,9 +37,9 @@ class JointEventNode[T, U, V](ev1: Event[T], ev2: => Event[U], interval: Int, me
    * Reaction to event2
    */
   lazy val onEvt2 = (id: Int, v2: U, reacts: ListBuffer[() => Unit]) => {
-    events2 = (time.now + interval, v2) :: events2
-    events1 = events1.filter(_._1 >= time.now)
-    for ((_, v1) <- events1.reverse) {
+    events2 = events2.enqueue((time.now + interval, v2))
+    events1 = events1.dropWhile(_._1 < time.now)
+    for ((_, v1) <- events1) {
       reactions(id, merge(v1, v2), reacts)
     }
   }
