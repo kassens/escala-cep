@@ -104,4 +104,20 @@ class MySuite extends FunSuite with OneInstancePerTest {
 
     assertLogged("bs")((1, 3), (2, 3), (1, 4), (2, 4))
   }
+
+  test("join with interval") {
+    val buyJoinSell = buy join (sell, 10, (a: Int, b: Int) => (a, b))
+    buyJoinSell += logger("bs")
+
+    buy(1)
+    sell(2)
+    sell(3)
+    sell(4)
+    time.add(11)
+    buy(5)
+    sell(6)
+    sell(7)
+
+    assertLogged("bs")((1, 2), (1, 3), (1, 4), (5, 6), (5, 7))
+  }
 }
