@@ -2,13 +2,27 @@ package scala.events
 
 import scala.collection.mutable.ListBuffer
 
-class JointEventNode[T, U, V](ev1: Event[T], ev2: => Event[U], merge: (T, U) => V) extends EventNode[V] {
+object time {
+  private var current: Int = 0
+
+  /** 
+   * Returns the current time used for CEP events.
+   */
+  protected[events] def now = current
+
+  def skip(seconds: Int) {
+    assert(seconds > 0)
+    current += seconds
+  }
+}
+
+class JointEventNode[T, U, V](ev1: Event[T], ev2: => Event[U], interval: Int, merge: (T, U) => V) extends EventNode[V] {
   var events1: List[T] = Nil
   var events2: List[U] = Nil
 
   /*
-  * Reaction to event1
-  */
+   * Reaction to event1
+   */
   lazy val onEvt1 = (id: Int, v1: T, reacts: ListBuffer[() => Unit]) => {
     events1 = v1 :: events1
     for (v2 <- events2.reverse) {
@@ -27,16 +41,16 @@ class JointEventNode[T, U, V](ev1: Event[T], ev2: => Event[U], merge: (T, U) => 
   }
 
   /*
-  * Register to the referenced events
-  */
+   * Register to the referenced events
+   */
   protected override def deploy {
     ev1 += onEvt1
     ev2 += onEvt2
   }
 
   /*
-  * Unregister from the referenced events
-  */
+   * Unregister from the referenced events
+   */
   protected override def undeploy {
     ev1 -= onEvt1
     ev2 -= onEvt2

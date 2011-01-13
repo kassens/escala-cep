@@ -68,7 +68,7 @@ trait Event[+T] {
    */
   def and[U, V, S >: T](other: Event[U], merge: (S, U) => V) = new EventNodeAnd[S, U, V](this, other, merge)
 
-  def join[U, V, S >: T](other: Event[U], merge: (S, U) => V) = new JointEventNode[S, U, V](this, other, merge)
+  def join[U, V, S >: T](other: Event[U], interval: Int, merge: (S, U) => V) = new JointEventNode[S, U, V](this, other, interval, merge)
 
   /*
   * Event conjunction with a merge method creating a tuple of both event parameters
