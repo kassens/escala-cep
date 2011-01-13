@@ -1,6 +1,6 @@
 package scala.events
 
-import scala.collection.mutable.{ListBuffer,Stack}
+import scala.collection.mutable.{ ListBuffer, Stack }
 
 trait IntervalEvent[+Start, +Stop] {
 
@@ -42,9 +42,9 @@ trait IntervalEvent[+Start, +Stop] {
 
 }
 
-class BetweenEvent[T,U](val start: Event[T], val end: Event[U]) extends IntervalEvent[T,U]
+class BetweenEvent[T, U](val start: Event[T], val end: Event[U]) extends IntervalEvent[T, U]
 
-class ExecutionEvent[T,U] extends IntervalEvent[T,U] {
+class ExecutionEvent[T, U] extends IntervalEvent[T, U] {
 
   def start: Event[T] = _start
   def end: Event[U] = _end

@@ -2,11 +2,11 @@ package scala
 
 package object events {
 
-  def between[T,U](start: Event[T], end: Event[U]) = new BetweenEvent(start, end)
+  def between[T, U](start: Event[T], end: Event[U]) = new BetweenEvent(start, end)
 
-  def within[T,U](ie: IntervalEvent[T,U]) = new WithinEvent(ie)
+  def within[T, U](ie: IntervalEvent[T, U]) = new WithinEvent(ie)
 
-  def ?[T](e: =>Event[T]) = new EventNodeCond(e)
+  def ?[T](e: => Event[T]) = new EventNodeCond(e)
 
 }
 
